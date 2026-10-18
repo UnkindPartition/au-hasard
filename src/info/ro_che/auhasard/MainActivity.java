@@ -216,7 +216,8 @@ public final class MainActivity extends Activity {
         numbersResult.showSingle(
                 String.valueOf(v),
                 getString(R.string.drawn_from),
-                "(" + range[0] + ", " + range[1] + ")");
+                "(" + range[0] + ", " + range[1] + ")",
+                () -> String.valueOf(Rng.uniform(rnd, range[0], range[1])));
     }
 
     private void shuffleNumbers() {
@@ -282,7 +283,8 @@ public final class MainActivity extends Activity {
         listResult.showSingle(
                 Rng.pick(rnd, items, 1).get(0),
                 getResources().getQuantityString(R.plurals.drawn_from_items, items.size(), items.size()),
-                null);
+                null,
+                () -> Rng.pick(rnd, items, 1).get(0));
         copyButton.setEnabled(true);
     }
 
