@@ -16,6 +16,7 @@ public final class RuledEditText extends EditText {
     private final Paint rulePaint = new Paint();
     private final Paint numberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final float numberGap;
+    private final float border;
 
     public RuledEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -27,6 +28,8 @@ public final class RuledEditText extends EditText {
         numberPaint.setTextSize(getTextSize() * 0.75f);
         numberPaint.setTextAlign(Paint.Align.RIGHT);
         numberGap = 10 * density;
+        // The width of the box drawn as the background (drawable/box.xml).
+        border = 1.5f * density;
     }
 
     @Override
@@ -36,9 +39,13 @@ public final class RuledEditText extends EditText {
             int top = getExtendedPaddingTop();
             int lineHeight = getLineHeight();
             int bottom = getScrollY() + getHeight();
+            // Keep the rules inside the box.
+            canvas.save();
+            canvas.clipRect(border, getScrollY() + border, getWidth() - border, bottom - border);
             for (int y = top + lineHeight; y < bottom; y += lineHeight) {
                 canvas.drawLine(0, y, getWidth(), y, rulePaint);
             }
+            canvas.restore();
 
             Editable text = getText();
             int lines = layout.getLineCount();

@@ -62,19 +62,32 @@
         <item name="android:textColor">@color/paper</item>
     </style>
 
-    <style name="Tile" parent="SmallCaps">
+    <!-- A tile is an icon above a label, centered together. -->
+    <style name="Tile">
         <item name="android:layout_width">64dp</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:background">@drawable/button_outline</item>
-        <item name="android:drawablePadding">2dp</item>
-        <item name="android:drawableTint">@color/on_outline</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
         <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="TileIcon">
+        <item name="android:layout_width">22dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:tint">@color/on_outline</item>
+    </style>
+
+    <style name="TileLabel" parent="SmallCaps">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:duplicateParentState">true</item>
         <item name="android:letterSpacing">0.08</item>
-        <item name="android:minWidth">0dp</item>
-        <item name="android:minHeight">0dp</item>
-        <item name="android:padding">2dp</item>
-        <item name="android:stateListAnimator">@null</item>
         <item name="android:textColor">@color/on_outline</item>
         <item name="android:textSize">13sp</item>
     </style>

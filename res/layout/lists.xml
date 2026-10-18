@@ -41,32 +41,60 @@
             android:layout_marginStart="12dp"
             android:orientation="vertical">
 
-            <Button
+            <info.ro_che.auhasard.TileLayout
                 android:id="@+id/paste"
-                style="@style/Tile"
-                android:drawableTop="@drawable/ic_paste"
-                android:text="@string/paste" />
+                style="@style/Tile">
 
-            <Button
+                <ImageView
+                    style="@style/TileIcon"
+                    android:src="@drawable/ic_paste" />
+
+                <TextView
+                    style="@style/TileLabel"
+                    android:text="@string/paste" />
+            </info.ro_che.auhasard.TileLayout>
+
+            <info.ro_che.auhasard.TileLayout
                 android:id="@+id/copy"
                 style="@style/Tile"
-                android:layout_marginTop="8dp"
-                android:drawableTop="@drawable/ic_copy"
-                android:text="@string/copy" />
+                android:layout_marginTop="8dp">
 
-            <Button
+                <ImageView
+                    style="@style/TileIcon"
+                    android:src="@drawable/ic_copy" />
+
+                <TextView
+                    style="@style/TileLabel"
+                    android:text="@string/copy" />
+            </info.ro_che.auhasard.TileLayout>
+
+            <info.ro_che.auhasard.TileLayout
                 android:id="@+id/save"
                 style="@style/Tile"
-                android:layout_marginTop="8dp"
-                android:drawableTop="@drawable/ic_save"
-                android:text="@string/save" />
+                android:layout_marginTop="8dp">
 
-            <Button
+                <ImageView
+                    style="@style/TileIcon"
+                    android:src="@drawable/ic_save" />
+
+                <TextView
+                    style="@style/TileLabel"
+                    android:text="@string/save" />
+            </info.ro_che.auhasard.TileLayout>
+
+            <info.ro_che.auhasard.TileLayout
                 android:id="@+id/saved"
                 style="@style/Tile"
-                android:layout_marginTop="8dp"
-                android:drawableTop="@drawable/ic_saved"
-                android:text="@string/saved" />
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    style="@style/TileIcon"
+                    android:src="@drawable/ic_saved" />
+
+                <TextView
+                    style="@style/TileLabel"
+                    android:text="@string/saved" />
+            </info.ro_che.auhasard.TileLayout>
         </LinearLayout>
     </LinearLayout>
 

@@ -16,7 +16,6 @@ import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +43,7 @@ public final class MainActivity extends Activity {
     private TextView numbersNote;
     private ResultArea numbersResult;
     private EditText listInput;
-    private Button copyButton;
+    private View copyButton;
     private ResultArea listResult;
 
     @Override
