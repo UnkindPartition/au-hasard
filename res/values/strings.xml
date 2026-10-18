@@ -5,13 +5,18 @@
     <string name="tab_numbers">Numbers</string>
     <string name="tab_lists">Lists</string>
 
-    <string name="min">Min</string>
-    <string name="max">Max</string>
+    <string name="from">from</string>
+    <string name="to">to</string>
     <string name="draw">Draw</string>
     <string name="shuffle">Shuffle</string>
     <string name="shuffle_capped">Showing %1$d of %2$s numbers</string>
     <string name="error_number">Enter a whole number</string>
-    <string name="error_max_below_min">Must not be less than Min</string>
+    <string name="error_max_below_min">Must not be less than the lower bound</string>
+    <string name="drawn_from">drawn from</string>
+    <plurals name="drawn_from_items">
+        <item quantity="one">the only item</item>
+        <item quantity="other">drawn from %d items</item>
+    </plurals>
 
     <string name="list_hint">One item per line</string>
     <string name="paste">Paste</string>

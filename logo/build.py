@@ -199,6 +199,21 @@ def path_element(d, fill, stroke_width=None):
     )
 
 
+def glyphs(src, dst):
+    """A vector drawable of typeset glyphs, cropped to their bounding box, for tinting."""
+    (x, y, w, h), paths = load(src)
+    with open(dst, "w") as f:
+        f.write(
+            '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
+            f'    android:width="{fmt(w)}dp"\n'
+            f'    android:height="{fmt(h)}dp"\n'
+            f'    android:viewportWidth="{fmt(w)}"\n'
+            f'    android:viewportHeight="{fmt(h)}">\n'
+        )
+        f.write(group(-x, -y, 1, "".join(path_element(d, "#000000") for d in paths)))
+        f.write("</vector>\n")
+
+
 def main():
     (x, y, w, h), paths = load("build/formula.svg")
     s = SAFE / math.hypot(w, h)
@@ -248,6 +263,9 @@ def main():
             + "".join(path_element(d, FOREGROUND) for d in paths),
         ),
     )
+    glyphs("build/formula.svg", "../res/drawable/formula.xml")
+    glyphs("build/u.svg", "../res/drawable/calligraphic_u.xml")
+
     # For themed icons, which tint the layer's shape: the formula without the halo.
     vector(
         "../res/drawable/ic_launcher_monochrome.xml",

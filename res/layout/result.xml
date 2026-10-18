@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A result: a single value, centered, with a caption, or a sequence as running text. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/result_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/result_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite"
+            android:saveEnabled="false"
+            android:textColor="@color/ink"
+            android:textIsSelectable="true" />
+
+        <LinearLayout
+            android:id="@+id/result_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/caption_text"
+                style="@style/RangeLabel"
+                android:saveEnabled="false"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/caption_u"
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:layout_marginStart="6dp"
+                android:adjustViewBounds="true"
+                android:importantForAccessibility="no"
+                android:src="@drawable/calligraphic_u"
+                android:tint="@color/accent" />
+
+            <TextView
+                android:id="@+id/caption_args"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lm_roman"
+                android:saveEnabled="false"
+                android:textColor="@color/accent"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

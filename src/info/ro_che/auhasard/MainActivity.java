@@ -8,9 +8,11 @@ import android.content.SharedPreferences;
 import android.graphics.Insets;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
@@ -32,22 +34,18 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private File savedListsFile;
     private int tab;
-    private boolean numbersSingle;
-    private boolean listSingle;
 
     private TextView tabNumbers;
     private TextView tabLists;
-    private View indicatorNumbers;
-    private View indicatorLists;
     private View numbersPanel;
     private View listsPanel;
     private EditText minInput;
     private EditText maxInput;
     private TextView numbersNote;
-    private TextView numbersResult;
+    private ResultArea numbersResult;
     private EditText listInput;
     private Button copyButton;
-    private TextView listResult;
+    private ResultArea listResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,17 +56,15 @@ public final class MainActivity extends Activity {
 
         tabNumbers = findViewById(R.id.tab_numbers);
         tabLists = findViewById(R.id.tab_lists);
-        indicatorNumbers = findViewById(R.id.indicator_numbers);
-        indicatorLists = findViewById(R.id.indicator_lists);
         numbersPanel = findViewById(R.id.numbers_panel);
         listsPanel = findViewById(R.id.lists_panel);
         minInput = findViewById(R.id.min);
         maxInput = findViewById(R.id.max);
         numbersNote = findViewById(R.id.numbers_note);
-        numbersResult = findViewById(R.id.numbers_result);
+        numbersResult = new ResultArea(findViewById(R.id.numbers_result));
         listInput = findViewById(R.id.list_input);
         copyButton = findViewById(R.id.copy);
-        listResult = findViewById(R.id.list_result);
+        listResult = new ResultArea(findViewById(R.id.list_result));
 
         // Keep content clear of the system bars and the keyboard.
         findViewById(R.id.root)
@@ -106,21 +102,19 @@ public final class MainActivity extends Activity {
     protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         state.putInt("tab", tab);
-        state.putBoolean("numbersSingle", numbersSingle);
-        state.putBoolean("listSingle", listSingle);
         state.putBoolean("noteVisible", numbersNote.getVisibility() == View.VISIBLE);
+        numbersResult.save(state, "numbers");
+        listResult.save(state, "list");
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
         showTab(state.getInt("tab"));
-        numbersSingle = state.getBoolean("numbersSingle");
-        listSingle = state.getBoolean("listSingle");
-        setResultStyle(numbersResult, numbersSingle);
-        setResultStyle(listResult, listSingle);
         numbersNote.setVisibility(state.getBoolean("noteVisible") ? View.VISIBLE : View.GONE);
-        copyButton.setEnabled(listResult.length() > 0);
+        numbersResult.restore(state, "numbers");
+        listResult.restore(state, "list");
+        copyButton.setEnabled(!listResult.isEmpty());
     }
 
     @Override
@@ -140,8 +134,6 @@ public final class MainActivity extends Activity {
         listsPanel.setVisibility(t == 1 ? View.VISIBLE : View.GONE);
         tabNumbers.setSelected(t == 0);
         tabLists.setSelected(t == 1);
-        indicatorNumbers.setVisibility(t == 0 ? View.VISIBLE : View.INVISIBLE);
-        indicatorLists.setVisibility(t == 1 ? View.VISIBLE : View.INVISIBLE);
     }
 
     // Numbers.
@@ -153,7 +145,10 @@ public final class MainActivity extends Activity {
         }
         long v = Rng.uniform(rnd, range[0], range[1]);
         numbersNote.setVisibility(View.GONE);
-        setResult(numbersResult, String.valueOf(v), true);
+        numbersResult.showSingle(
+                String.valueOf(v),
+                getString(R.string.drawn_from),
+                "(" + range[0] + ", " + range[1] + ")");
     }
 
     private void shuffleNumbers() {
@@ -183,7 +178,7 @@ public final class MainActivity extends Activity {
         } else {
             numbersNote.setVisibility(View.GONE);
         }
-        setResult(numbersResult, text, false);
+        numbersResult.showSequence(text, 22);
     }
 
     /** The range entered by the user, or null after flagging an error on the input. */
@@ -216,7 +211,11 @@ public final class MainActivity extends Activity {
         if (items == null) {
             return;
         }
-        setResult(listResult, Rng.pick(rnd, items, 1).get(0), true);
+        listResult.showSingle(
+                Rng.pick(rnd, items, 1).get(0),
+                getResources().getQuantityString(R.plurals.drawn_from_items, items.size(), items.size()),
+                null);
+        copyButton.setEnabled(true);
     }
 
     private void shuffleItems() {
@@ -225,14 +224,25 @@ public final class MainActivity extends Activity {
             return;
         }
         List<String> shuffled = Rng.shuffle(rnd, items);
-        StringBuilder text = new StringBuilder();
+        // Each item preceded by its position, small and in the accent color.
+        SpannableStringBuilder text = new SpannableStringBuilder();
         for (int i = 0; i < shuffled.size(); i++) {
             if (i > 0) {
                 text.append('\n');
             }
-            text.append(i + 1).append(". ").append(shuffled.get(i));
+            int start = text.length();
+            text.append(String.valueOf(i + 1));
+            text.setSpan(
+                    new ForegroundColorSpan(getColor(R.color.accent)),
+                    start,
+                    text.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(
+                    new RelativeSizeSpan(0.75f), start, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.append('\u2002').append(shuffled.get(i));
         }
-        setResult(listResult, text, false);
+        listResult.showSequence(text, 20);
+        copyButton.setEnabled(true);
     }
 
     /** The items of the list, or null after flagging that it is empty. */
@@ -248,7 +258,7 @@ public final class MainActivity extends Activity {
     private void copy() {
         getSystemService(ClipboardManager.class)
                 .setPrimaryClip(
-                        ClipData.newPlainText(getString(R.string.app_name), listResult.getText()));
+                        ClipData.newPlainText(getString(R.string.app_name), listResult.text().toString()));
         // Android 13+ confirms copies itself.
         if (Build.VERSION.SDK_INT < 33) {
             Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
@@ -371,24 +381,5 @@ public final class MainActivity extends Activity {
             Toast.makeText(this, R.string.error_storage, Toast.LENGTH_LONG).show();
             return false;
         }
-    }
-
-    // Results.
-
-    /** Shows a result: a single value large and centered, a sequence as running text. */
-    private void setResult(TextView view, CharSequence text, boolean single) {
-        view.setText(text);
-        setResultStyle(view, single);
-        if (view == listResult) {
-            listSingle = single;
-            copyButton.setEnabled(true);
-        } else {
-            numbersSingle = single;
-        }
-    }
-
-    private static void setResultStyle(TextView view, boolean single) {
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, single ? 48 : 20);
-        view.setGravity(single ? Gravity.CENTER_HORIZONTAL : Gravity.START);
     }
 }

@@ -4,7 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="22dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="22dp"
+    android:paddingBottom="22dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,55 +15,68 @@
         android:layout_weight="1"
         android:orientation="horizontal">
 
-        <EditText
+        <info.ro_che.auhasard.RuledEditText
             android:id="@+id/list_input"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/box"
+            android:fontFamily="@font/lm_roman"
             android:gravity="top|start"
             android:hint="@string/list_hint"
             android:imeOptions="flagNoPersonalizedLearning"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine|textCapSentences" />
+            android:inputType="textMultiLine|textCapSentences"
+            android:lineHeight="32dp"
+            android:paddingStart="42dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/ink"
+            android:textSize="19sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
             <Button
                 android:id="@+id/paste"
-                style="@style/SideButton"
+                style="@style/Tile"
+                android:drawableTop="@drawable/ic_paste"
                 android:text="@string/paste" />
 
             <Button
                 android:id="@+id/copy"
-                style="@style/SideButton"
+                style="@style/Tile"
+                android:layout_marginTop="8dp"
+                android:drawableTop="@drawable/ic_copy"
                 android:text="@string/copy" />
 
             <Button
                 android:id="@+id/save"
-                style="@style/SideButton"
+                style="@style/Tile"
+                android:layout_marginTop="8dp"
+                android:drawableTop="@drawable/ic_save"
                 android:text="@string/save" />
 
             <Button
                 android:id="@+id/saved"
-                style="@style/SideButton"
+                style="@style/Tile"
+                android:layout_marginTop="8dp"
+                android:drawableTop="@drawable/ic_saved"
                 android:text="@string/saved" />
         </LinearLayout>
     </LinearLayout>
 
-    <ScrollView
+    <Space
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1">
+        android:layout_height="16dp" />
 
-        <TextView
-            android:id="@+id/list_result"
-            style="@style/Result" />
-    </ScrollView>
+    <include
+        android:id="@+id/list_result"
+        layout="@layout/result" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -70,14 +86,13 @@
 
         <Button
             android:id="@+id/draw_item"
-            style="@style/ActionButton"
-            android:layout_marginEnd="8dp"
+            style="@style/ActionButton.Primary"
+            android:layout_marginEnd="12dp"
             android:text="@string/draw" />
 
         <Button
             android:id="@+id/shuffle_items"
             style="@style/ActionButton"
-            android:layout_marginStart="8dp"
             android:text="@string/shuffle" />
     </LinearLayout>
 </LinearLayout>

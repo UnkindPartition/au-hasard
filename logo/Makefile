@@ -9,15 +9,16 @@ $(BUILD)/%.dvi: %.tex
 	mkdir -p $(BUILD)
 	latex -interaction=nonstopmode -halt-on-error -output-directory=$(BUILD) $<
 
-$(BUILD)/formula.svg: $(BUILD)/formula.dvi
+$(BUILD)/%.svg: $(BUILD)/%.dvi
 	dvisvgm --no-fonts=1 --exact-bbox -o $@ $<
 
 $(BUILD)/digits.svg: $(BUILD)/digits.dvi
 	dvisvgm --no-fonts=1 --bbox=papersize --precision=2 -o $@ $<
 
 $(OUT)/icon.svg $(OUT)/preview.html ../res/drawable/ic_launcher_background.xml \
-		../res/drawable/ic_launcher_foreground.xml ../res/drawable/ic_launcher_monochrome.xml &: \
-		$(BUILD)/formula.svg $(BUILD)/digits.svg build.py
+		../res/drawable/ic_launcher_foreground.xml ../res/drawable/ic_launcher_monochrome.xml \
+		../res/drawable/formula.xml ../res/drawable/calligraphic_u.xml &: \
+		$(BUILD)/formula.svg $(BUILD)/u.svg $(BUILD)/digits.svg build.py
 	python3 build.py
 
 # Google Play store listing icon
