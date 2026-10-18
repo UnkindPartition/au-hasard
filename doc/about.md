@@ -57,7 +57,7 @@ remaining values split evenly.
 *Shuffling lists.* Lists are shuffled with the
 [Fisher–Yates algorithm](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle), which
 fills the positions one by one, each with an item chosen at random from those not
-yet placed. Picking items stops after the first positions.
+yet placed.
 
 *Shuffling numbers.* Shuffle on the Numbers tab shows up to 100 different numbers
 from the range, in random order. Writing out a huge range just to shuffle it would

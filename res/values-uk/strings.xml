@@ -1,3 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="tab_numbers">Числа</string>
+    <string name="tab_lists">Списки</string>
+    <string name="tab_about">Інфо</string>
+    <string name="about_page">about-uk.html</string>
+
+    <string name="from">від</string>
+    <string name="to">до</string>
+    <string name="draw">Вибрати</string>
+    <string name="shuffle">Перемішати</string>
+    <string name="shuffle_capped">Показано %1$d із %2$s чисел</string>
+    <string name="error_number">Введіть ціле число</string>
+    <string name="error_max_below_min">Не може бути меншим за нижню межу</string>
+    <string name="drawn_from">вибрано з</string>
+    <plurals name="drawn_from_items">
+        <item quantity="one">вибрано з %d елемента</item>
+        <item quantity="few">вибрано з %d елементів</item>
+        <item quantity="many">вибрано з %d елементів</item>
+        <item quantity="other">вибрано з %d елемента</item>
+    </plurals>
+
+    <string name="list_hint">Один елемент на рядок</string>
+    <string name="paste">Вставити</string>
+    <string name="copy">Копіювати</string>
+    <string name="save">Зберегти</string>
+    <string name="saved">Збережені</string>
+    <string name="error_empty_list">Список порожній</string>
+    <string name="copied">Скопійовано</string>
+    <string name="clipboard_empty">Буфер обміну порожній</string>
+    <string name="list_saved">Список збережено</string>
+    <string name="already_saved">Цей список уже збережено</string>
+    <string name="saved_lists">Збережені списки</string>
+    <string name="no_saved_lists">Збережених списків ще немає</string>
+    <string name="delete_list">Видалити цей список?</string>
+    <string name="delete">Видалити</string>
+    <string name="error_storage">Не вдалося отримати доступ до збережених списків</string>
 </resources>

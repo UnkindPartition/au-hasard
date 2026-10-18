@@ -9,6 +9,9 @@ DEBUG_KEYSTORE = $(HOME)/.android/debug.keystore
 BUNDLETOOL ?= /opt/bundletool/bundletool.jar
 RELEASE_ALIAS ?= au-hasard
 UPLOAD_ALIAS ?= upload
+ABOUT_PAGES = assets/about.html assets/about-fr.html assets/about-uk.html
+ABOUT_DEPS = doc/style.html doc/mathcal.lua doc/calligraphic-u.svg
+PANDOC_ABOUT = pandoc $< --standalone --lua-filter=doc/mathcal.lua --include-in-header=doc/style.html -o $@
 JUNIT = /usr/share/java/junit.jar:/usr/share/java/hamcrest/hamcrest.jar
 
 apk: $(BUILD)/au-hasard-debug.apk
@@ -21,7 +24,7 @@ $(BUILD)/res.zip: $(shell find res -type f)
 	$(BUILD_TOOLS)/aapt2 compile --dir res -o $@
 
 # Also generates R.java.
-$(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml assets/about.html $(shell find assets -type f)
+$(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml $(ABOUT_PAGES) $(shell find assets -type f)
 	rm -rf $(BUILD)/gen
 	$(BUILD_TOOLS)/aapt2 link -o $@ -I $(PLATFORM) --manifest AndroidManifest.xml \
 		-A assets --java $(BUILD)/gen $(BUILD)/res.zip
@@ -60,7 +63,7 @@ aab: $(BUILD)/au-hasard.aab
 
 # The base module is the proto-format resource APK rearranged into the layout
 # bundletool expects.
-$(BUILD)/base.zip: $(BUILD)/res.zip AndroidManifest.xml assets/about.html $(shell find assets -type f) $(BUILD)/classes.dex
+$(BUILD)/base.zip: $(BUILD)/res.zip AndroidManifest.xml $(ABOUT_PAGES) $(shell find assets -type f) $(BUILD)/classes.dex
 	rm -rf $(BUILD)/base $@
 	$(BUILD_TOOLS)/aapt2 link --proto-format -o $(BUILD)/proto.apk -I $(PLATFORM) \
 		--manifest AndroidManifest.xml -A assets $(BUILD)/res.zip
@@ -84,12 +87,16 @@ $(DEBUG_KEYSTORE):
 	keytool -genkeypair -keystore $@ -storepass android -alias androiddebugkey \
 		-keyalg RSA -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
-# The About page, also usable as a standalone web page.
-about: assets/about.html
+# The About page, also usable as a standalone web page; one per language.
+about: $(ABOUT_PAGES)
 
-assets/about.html: doc/about.md doc/style.html doc/mathcal.lua doc/calligraphic-u.svg
+assets/about.html: doc/about.md $(ABOUT_DEPS)
 	mkdir -p assets
-	pandoc $< --standalone --lua-filter=doc/mathcal.lua --include-in-header=doc/style.html -o $@
+	$(PANDOC_ABOUT)
+
+assets/about-%.html: doc/about.%.md $(ABOUT_DEPS)
+	mkdir -p assets
+	$(PANDOC_ABOUT)
 
 test: compile-tests
 	java -cp $(BUILD)/test:$(JUNIT) info.ro_che.auhasard.RunTests
