@@ -28,6 +28,14 @@ The results are unpredictable as long as either source is. Even if the phone's
 generator were flawed, or deliberately weakened, the timing of your taps would
 keep the draws from being predicted or reproduced by anyone outside your phone.
 
+Apart from being unpredictable, fair draws also need to be statistically correct:
+every outcome equally likely, and each draw independent of the ones before it.
+*Au hasard*'s methods, described below in more detail, are thoroughly verified with statistical tests:
+[chi-square tests](https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test) of
+uniformity and of independence between consecutive draws, and a
+[runs test](https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test) for
+trends.
+
 ## How does it work, exactly?
 
 When the app starts, a 256-bit key is read from the kernel's random number generator,
@@ -57,11 +65,6 @@ be impossible, so the numbers are chosen with
 [Robert Floyd](https://en.wikipedia.org/wiki/Robert_W._Floyd)'s sampling algorithm,
 which needs only as many steps as numbers chosen, and then put in random order with
 Fisher–Yates.
-
-*Testing.* The algorithms are checked with statistical tests:
-[chi-square tests](https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test) of
-uniformity and of independence between consecutive draws, and a
-[runs test](https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test).
 
 ## What about privacy?
 
