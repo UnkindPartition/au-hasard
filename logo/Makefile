@@ -12,7 +12,7 @@ $(BUILD)/formula.dvi: formula.tex
 $(BUILD)/formula.svg: $(BUILD)/formula.dvi
 	dvisvgm --no-fonts=1 --exact-bbox -o $@ $<
 
-$(OUT)/icon.svg $(OUT)/ic_launcher_foreground.xml $(OUT)/ic_launcher_background.xml $(OUT)/preview.html &: $(BUILD)/formula.svg build.py
+$(OUT)/icon.svg ../res/drawable/ic_launcher_foreground.xml ../res/drawable/ic_launcher_background.xml $(OUT)/preview.html &: $(BUILD)/formula.svg build.py
 	python3 build.py
 
 # Google Play store listing icon

@@ -160,7 +160,7 @@ def main():
         f'    android:viewportHeight="{SIZE}">\n'
     )
 
-    with open("out/ic_launcher_foreground.xml", "w") as f:
+    with open("../res/drawable/ic_launcher_foreground.xml", "w") as f:
         f.write(header)
         f.write(
             "    <group\n"
@@ -177,7 +177,7 @@ def main():
             )
         f.write("    </group>\n</vector>\n")
 
-    with open("out/ic_launcher_background.xml", "w") as f:
+    with open("../res/drawable/ic_launcher_background.xml", "w") as f:
         f.write(header)
         f.write(
             "    <path\n"
