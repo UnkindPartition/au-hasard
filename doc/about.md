@@ -6,7 +6,7 @@ document-css: false
 
 ## What does *Au hasard* mean?
 
-It's French for "at random", pronounced roughly "oh ah-ZAR" (IPA: /o a.zaʁ/).
+It's French for "at random", pronounced "oh ah-ZAR" (/o a.zaʁ/).
 
 ## What does ![𝒰(a, b)](formula.svg){.formula} mean?
 
@@ -15,50 +15,27 @@ every value from *a* to *b* is equally likely. That's exactly what *Au hasard* d
 
 ## Are the results truly random?
 
-*Au hasard* gets its randomness from your phone's operating system: the
-cryptographically secure random number generator of the Linux kernel, the same
-source that is used to generate encryption keys. The kernel collects unpredictable
-physical events, such as the precise timing of hardware interrupts and, on most
-modern phones, the output of a hardware random number generator built into the
-chip. From these it seeds a generator whose output can't be predicted or
-reproduced by anyone, including the author of this app.
+Yes. *Au hasard* uses two sources of randomness:
 
-## But random.org says these numbers are pseudo-random and «generated in a predictable fashion»!
+- Your phone's operating system. The Linux kernel collects unpredictable physical
+  events, such as the precise timing of hardware interrupts and, on most modern
+  phones, the output of a hardware random number generator built into the chip.
+  The app takes its starting point from the kernel's random number generator.
+- You. Each time you press Draw or Shuffle, the precise moment of your tap, down
+  to the nanosecond, is mixed in.
 
-That's true of ordinary pseudo-random number generators, like the ones built into
-most programming languages: they're simple formulas, so after seeing a few outputs
-you can work out all the following ones.
+The results are unpredictable as long as either source is. Even if the phone's
+generator were flawed, or deliberately weakened, the timing of your taps would
+keep the draws from being predicted or reproduced by anyone outside your phone.
 
-*Au hasard*'s numbers are pseudo-random too, but in a much stronger sense. They come
-from a [*cryptographically secure*](https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator)
-generator, which is designed so that its output
-can't be predicted, even by someone who has seen any number of previous outputs,
-without knowing its internal state. That state is seeded from physical events,
-like random.org's numbers, is constantly refreshed with more of them, and never
-leaves your phone's operating system. Predicting it would mean breaking the
-cryptography that protects encryption keys, including the ones that keep your
-connection to random.org private.
+## How does it work, exactly?
 
-In practice, for drawing a number, a winner or an order, there's no difference
-you could detect: both sources are unpredictable and unbiased. One thing random.org
-does offer is draws recorded by a third party, so that others can check that a draw
-was fair. If you need that, for example for an official lottery, use such a
-service.
-
-## What about privacy?
-
-*Au hasard* is built to respect it:
-
-- It works fully offline. The app doesn't even have permission to use the Internet,
-  so nothing you enter or draw can leave your phone.
-- No ads, no tracking, no analytics, no account.
-- Your saved lists are stored only on your phone, and excluded from cloud backups.
-- It's free software: anyone can read the source code and check all of the above.
-
-## How does it work?
-
-*The source of randomness* is Java's `SecureRandom`, which on Android is
-provided by BoringSSL and seeded from the Linux kernel's random number generator.
+When the app starts, a 256-bit key is read from the kernel's random number generator,
+`/dev/urandom`. Before each draw or shuffle, the key is replaced with the
+[SHA-256](https://en.wikipedia.org/wiki/SHA-2) hash of the previous key and the
+time of your tap in nanoseconds. From the current key, the cipher
+[ChaCha20](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) produces the stream of random 64-bit numbers from which the draws and shuffles
+below are made.
 
 *Drawing numbers.* To draw from a range of *n* = *b* − *a* + 1 numbers, the app
 takes a random 64-bit number *x* and returns *a* + (*x* mod *n*). Done naively,
@@ -69,27 +46,25 @@ and drawing again when it gets one of them
 ([rejection sampling](https://en.wikipedia.org/wiki/Rejection_sampling)). The
 remaining values split evenly.
 
-*Shuffling and picking.* Lists are shuffled with the
+*Shuffling lists.* Lists are shuffled with the
 [Fisher–Yates algorithm](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle), which
 fills the positions one by one, each with an item chosen at random from those not
-yet placed. Picking items stops after the first positions. Distinct numbers from a
-range are chosen with [Robert Floyd](https://en.wikipedia.org/wiki/Robert_W._Floyd)'s
-sampling algorithm, which is fast even for huge
-ranges, and then shuffled.
+yet placed. Picking items stops after the first positions.
+
+*Shuffling numbers.* Shuffle on the Numbers tab shows up to 100 different numbers
+from the range, in random order. Writing out a huge range just to shuffle it would
+be impossible, so the numbers are chosen with
+[Robert Floyd](https://en.wikipedia.org/wiki/Robert_W._Floyd)'s sampling algorithm,
+which needs only as many steps as numbers chosen, and then put in random order with
+Fisher–Yates.
 
 *Testing.* The algorithms are checked with statistical tests:
 [chi-square tests](https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test) of
 uniformity and of independence between consecutive draws, and a
-[runs test](https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test). Each test
-is repeated with 2,000 different seeds, and the spread of its outcomes is tested in
-turn.
+[runs test](https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test).
 
-## Credits
+## What about privacy?
 
-*Au hasard* is free software, licensed under the
-[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html), version 3
-or later.
-
-The text is set in CMU Serif, a Unicode version of Donald Knuth's Computer Modern
-converted and maintained by Andrey V. Panov, under the
-[SIL Open Font License](https://openfontlicense.org), version 1.1.
+*Au hasard* works fully offline. The app doesn't even have permission to use
+the Internet, so nothing you enter or draw can leave your phone. Likewise, it
+doesn't collect or transmit any analytics or other data.
