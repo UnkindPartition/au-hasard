@@ -17,6 +17,8 @@ public final class RuledEditText extends EditText {
     private final Paint numberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final float numberGap;
     private final float border;
+    /** The distance between lines: the android:lineHeight attribute, exactly. */
+    private final int pitch;
 
     public RuledEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -30,6 +32,11 @@ public final class RuledEditText extends EditText {
         numberGap = 10 * density;
         // The width of the box drawn as the background (drawable/box.xml).
         border = 1.5f * density;
+        // android:lineHeight counts the font's line gap, which the layout of the lines doesn't,
+        // so for fonts with a line gap the lines would end up closer than requested.
+        pitch = getLineHeight();
+        Paint.FontMetricsInt fm = getPaint().getFontMetricsInt();
+        setLineSpacing(pitch - (fm.descent - fm.ascent), 1);
     }
 
     @Override
@@ -37,18 +44,28 @@ public final class RuledEditText extends EditText {
         Layout layout = getLayout();
         if (layout != null) {
             int top = getExtendedPaddingTop();
-            int lineHeight = getLineHeight();
             int bottom = getScrollY() + getHeight();
+            int lines = layout.getLineCount();
+            // Each rule lies under a baseline, midway between the descenders of its line and
+            // the ascenders of the next. Below the text, the rules continue at the same pitch.
+            Paint.FontMetrics fm = getPaint().getFontMetrics();
+            float gap = fm.descent + (pitch - (fm.descent - fm.ascent)) / 2;
             // Keep the rules inside the box.
             canvas.save();
             canvas.clipRect(border, getScrollY() + border, getWidth() - border, bottom - border);
-            for (int y = top + lineHeight; y < bottom; y += lineHeight) {
+            for (int i = 0; ; i++) {
+                float y =
+                        i < lines
+                                ? top + layout.getLineBaseline(i) + gap
+                                : top + layout.getLineBaseline(lines - 1) + gap + (i - lines + 1) * pitch;
+                if (y >= bottom) {
+                    break;
+                }
                 canvas.drawLine(0, y, getWidth(), y, rulePaint);
             }
             canvas.restore();
 
             Editable text = getText();
-            int lines = layout.getLineCount();
             float x = getCompoundPaddingLeft() - numberGap;
             int item = 0;
             for (int i = 0; i < lines; i++) {
