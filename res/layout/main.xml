@@ -50,6 +50,11 @@
             android:id="@+id/tab_lists"
             style="@style/Tab"
             android:text="@string/tab_lists" />
+
+        <TextView
+            android:id="@+id/tab_about"
+            style="@style/Tab"
+            android:text="@string/tab_about" />
     </LinearLayout>
 
     <View
@@ -65,5 +70,11 @@
         <include layout="@layout/numbers" />
 
         <include layout="@layout/lists" />
+
+        <WebView
+            android:id="@+id/about_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

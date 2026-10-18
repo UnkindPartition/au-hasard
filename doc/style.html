@@ -1,0 +1,58 @@
+<style>
+  /* The fonts come from the app's resources, or from next to the page on the web. */
+  @font-face {
+    font-family: "CMU Serif";
+    font-style: normal;
+    src: url("file:///android_res/font/cmu_serif.otf"), url("cmu_serif.otf");
+  }
+  @font-face {
+    font-family: "CMU Serif";
+    font-style: italic;
+    src: url("file:///android_res/font/cmu_serif_italic.otf"), url("cmu_serif_italic.otf");
+  }
+
+  :root {
+    color-scheme: light dark;
+    --paper: #f6f1e6;
+    --ink: #1d1a16;
+    --soft: #8a8174;
+    --rule: #d9cfbd;
+    --accent: #a4161a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #17191d;
+      --ink: #ece6da;
+      --soft: #9a9283;
+      --rule: #34373d;
+      --accent: #ff6b5e;
+    }
+    img.formula { filter: invert(0.92); }
+  }
+
+  html { background: var(--paper); color: var(--ink); }
+  body {
+    max-width: 36em;
+    margin: 0 auto;
+    padding: 4px 22px 32px;
+    font: 19px/1.5 "CMU Serif", serif;
+    hyphens: auto;
+  }
+  h2 {
+    margin: 1.6em 0 0.5em;
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid var(--rule);
+    font-size: 1.25em;
+    font-weight: normal;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+  }
+  h2:first-child { margin-top: 0.8em; }
+  p, ul { margin: 0 0 0.8em; }
+  ul { padding-left: 1.2em; }
+  li { margin-bottom: 0.3em; }
+  li::marker { color: var(--accent); }
+  a { color: var(--accent); }
+  code { font-size: 0.85em; }
+  img.formula { height: 1.1em; vertical-align: -0.28em; }
+</style>

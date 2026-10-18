@@ -2,8 +2,10 @@ package info.ro_che.auhasard;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Insets;
 import android.os.Build;
@@ -18,6 +20,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowInsets;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,10 +44,9 @@ public final class MainActivity extends Activity {
     private GestureDetector swipes;
     private boolean swiped;
 
-    private TextView tabNumbers;
-    private TextView tabLists;
-    private View numbersPanel;
-    private View listsPanel;
+    private TextView[] tabs;
+    private View[] panels;
+    private WebView about;
     private EditText minInput;
     private EditText maxInput;
     private TextView numbersNote;
@@ -58,10 +62,11 @@ public final class MainActivity extends Activity {
         prefs = getSharedPreferences("state", MODE_PRIVATE);
         savedListsFile = new File(getFilesDir(), "saved_lists.txt");
 
-        tabNumbers = findViewById(R.id.tab_numbers);
-        tabLists = findViewById(R.id.tab_lists);
-        numbersPanel = findViewById(R.id.numbers_panel);
-        listsPanel = findViewById(R.id.lists_panel);
+        tabs = new TextView[] {
+            findViewById(R.id.tab_numbers), findViewById(R.id.tab_lists), findViewById(R.id.tab_about)
+        };
+        about = findViewById(R.id.about_panel);
+        panels = new View[] {findViewById(R.id.numbers_panel), findViewById(R.id.lists_panel), about};
         minInput = findViewById(R.id.min);
         maxInput = findViewById(R.id.max);
         numbersNote = findViewById(R.id.numbers_note);
@@ -84,8 +89,10 @@ public final class MainActivity extends Activity {
                             return insets;
                         });
 
-        tabNumbers.setOnClickListener(v -> switchTab(0));
-        tabLists.setOnClickListener(v -> switchTab(1));
+        for (int i = 0; i < tabs.length; i++) {
+            int t = i;
+            tabs[i].setOnClickListener(v -> switchTab(t));
+        }
         swipes = new GestureDetector(this, new SwipeListener());
         findViewById(R.id.draw_number).setOnClickListener(v -> drawNumber());
         findViewById(R.id.shuffle_numbers).setOnClickListener(v -> shuffleNumbers());
@@ -159,8 +166,8 @@ public final class MainActivity extends Activity {
                     || Math.abs(vx) < 3 * config.getScaledMinimumFlingVelocity()) {
                 return false;
             }
-            int target = dx < 0 ? 1 : 0;
-            if (target != tab) {
+            int target = tab + (dx < 0 ? 1 : -1);
+            if (target >= 0 && target < tabs.length) {
                 swiped = true;
                 switchTab(target);
             }
@@ -173,10 +180,10 @@ public final class MainActivity extends Activity {
         if (t == tab) {
             return;
         }
-        View in = t == 0 ? numbersPanel : listsPanel;
-        View out = t == 0 ? listsPanel : numbersPanel;
+        View in = panels[t];
+        View out = panels[tab];
         float width = ((View) in.getParent()).getWidth();
-        float direction = t == 1 ? 1 : -1;
+        float direction = t > tab ? 1 : -1;
         in.animate().cancel();
         out.animate().cancel();
         showTab(t);
@@ -196,12 +203,33 @@ public final class MainActivity extends Activity {
 
     private void showTab(int t) {
         tab = t;
-        numbersPanel.setVisibility(t == 0 ? View.VISIBLE : View.GONE);
-        listsPanel.setVisibility(t == 1 ? View.VISIBLE : View.GONE);
-        numbersPanel.setTranslationX(0);
-        listsPanel.setTranslationX(0);
-        tabNumbers.setSelected(t == 0);
-        tabLists.setSelected(t == 1);
+        for (int i = 0; i < panels.length; i++) {
+            panels[i].animate().cancel();
+            panels[i].setVisibility(i == t ? View.VISIBLE : View.GONE);
+            panels[i].setTranslationX(0);
+            tabs[i].setSelected(i == t);
+        }
+        if (panels[t] == about && about.getUrl() == null) {
+            loadAbout();
+        }
+    }
+
+    /** Loads the About page; its links open in the browser. */
+    private void loadAbout() {
+        about.setBackgroundColor(0);
+        about.setWebViewClient(
+                new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, request.getUrl()));
+                        } catch (ActivityNotFoundException e) {
+                            // No browser installed.
+                        }
+                        return true;
+                    }
+                });
+        about.loadUrl("file:///android_asset/" + getString(R.string.about_page));
     }
 
     // Numbers.

@@ -4,6 +4,9 @@
 
     <string name="tab_numbers">Numbers</string>
     <string name="tab_lists">Lists</string>
+    <string name="tab_about">About</string>
+    <!-- The About page in assets/, generated from doc/about.md; one per language. -->
+    <string name="about_page">about.html</string>
 
     <string name="from">from</string>
     <string name="to">to</string>

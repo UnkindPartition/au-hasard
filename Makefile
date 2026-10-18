@@ -17,10 +17,10 @@ $(BUILD)/res.zip: $(shell find res -type f)
 	$(BUILD_TOOLS)/aapt2 compile --dir res -o $@
 
 # Also generates R.java.
-$(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml
+$(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml $(shell find assets -type f)
 	rm -rf $(BUILD)/gen
 	$(BUILD_TOOLS)/aapt2 link -o $@ -I $(PLATFORM) --manifest AndroidManifest.xml \
-		--java $(BUILD)/gen $(BUILD)/res.zip
+		-A assets --java $(BUILD)/gen $(BUILD)/res.zip
 
 # Compiling against android.jar as the boot class path (which requires -source 8)
 # rejects JDK APIs that Android doesn't have. The lambda stubs let javac compile lambdas,
@@ -46,6 +46,13 @@ $(DEBUG_KEYSTORE):
 	keytool -genkeypair -keystore $@ -storepass android -alias androiddebugkey \
 		-keyalg RSA -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
+# The About page, also usable as a standalone web page. Requires pandoc.
+about: assets/about.html
+
+assets/about.html: doc/about.md doc/style.html
+	mkdir -p assets
+	pandoc $< --standalone --include-in-header=doc/style.html -o $@
+
 test: compile-tests
 	java -cp $(BUILD)/test:$(JUNIT) info.ro_che.auhasard.RunTests
 
@@ -62,4 +69,4 @@ compile-tests:
 clean:
 	rm -rf $(BUILD)
 
-.PHONY: apk install test stats compile-tests clean
+.PHONY: apk install about test stats compile-tests clean
