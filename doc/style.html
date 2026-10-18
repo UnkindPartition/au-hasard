@@ -27,7 +27,6 @@
       --rule: #34373d;
       --accent: #ff6b5e;
     }
-    img.formula { filter: invert(0.92); }
   }
 
   html { background: var(--paper); color: var(--ink); }
@@ -54,5 +53,6 @@
   li::marker { color: var(--accent); }
   a { color: var(--accent); }
   code { font-size: 0.85em; }
-  img.formula { height: 1.1em; vertical-align: -0.28em; }
+  /* A typeset glyph standing in for a letter (doc/mathcal.lua): the height of a capital. */
+  svg.glyph { height: 0.7em; vertical-align: -0.02em; }
 </style>

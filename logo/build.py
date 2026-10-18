@@ -214,6 +214,20 @@ def glyphs(src, dst):
         f.write("</vector>\n")
 
 
+def inline_svg(src, dst, label):
+    """An SVG of typeset glyphs for inlining in HTML, cropped to their bounding box and drawn
+    in the text's color."""
+    (x, y, w, h), paths = load(src)
+    with open(dst, "w") as f:
+        f.write(
+            f'<svg class="glyph" xmlns="http://www.w3.org/2000/svg" '
+            f'viewBox="{fmt(x)} {fmt(y)} {fmt(w)} {fmt(h)}" fill="currentColor" '
+            f'role="img" aria-label="{label}">'
+        )
+        f.write("".join(f'<path d="{d}"/>' for d in paths))
+        f.write("</svg>\n")
+
+
 def main():
     (x, y, w, h), paths = load("build/formula.svg")
     s = SAFE / math.hypot(w, h)
@@ -265,6 +279,7 @@ def main():
     )
     glyphs("build/formula.svg", "../res/drawable/formula.xml")
     glyphs("build/u.svg", "../res/drawable/calligraphic_u.xml")
+    inline_svg("build/u.svg", "../doc/calligraphic-u.svg", "𝒰")
 
     # For themed icons, which tint the layer's shape: the formula without the halo.
     vector(

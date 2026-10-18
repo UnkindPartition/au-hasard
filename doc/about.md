@@ -8,10 +8,10 @@ document-css: false
 
 It's French for "at random", pronounced "oh ah-ZAR" (/o a.zaʁ/).
 
-## What does ![𝒰(a, b)](formula.svg){.formula} mean?
+## What does $\mathcal{U}(a, b)$ mean?
 
-It's the mathematical notation for the *uniform distribution* between *a* and *b*:
-every value from *a* to *b* is equally likely. That's exactly what *Au hasard* does.
+It's the mathematical notation for the *uniform distribution* between $a$ and $b$:
+every value from $a$ to $b$ is equally likely. That's exactly what *Au hasard* does.
 
 ## Are the results truly random?
 
@@ -37,11 +37,11 @@ time of your tap in nanoseconds. From the current key, the cipher
 [ChaCha20](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) produces the stream of random 64-bit numbers from which the draws and shuffles
 below are made.
 
-*Drawing numbers.* To draw from a range of *n* = *b* − *a* + 1 numbers, the app
-takes a random 64-bit number *x* and returns *a* + (*x* mod *n*). Done naively,
-this would be slightly biased: the 2^64^ possible values of *x* can't always be
-split evenly among *n* results, so some results would come up a tiny bit more
-often. The app avoids this by discarding the 2^64^ mod *n* smallest values of *x*
+*Drawing numbers.* To draw from a range of $n = b - a + 1$ numbers, the app
+takes a random 64-bit number $x$ and returns $a + (x \bmod n)$. Done naively,
+this would be slightly biased: the $2^{64}$ possible values of $x$ can't always be
+split evenly among $n$ results, so some results would come up a tiny bit more
+often. The app avoids this by discarding the $2^{64} \bmod n$ smallest values of $x$
 and drawing again when it gets one of them
 ([rejection sampling](https://en.wikipedia.org/wiki/Rejection_sampling)). The
 remaining values split evenly.

@@ -49,9 +49,9 @@ $(DEBUG_KEYSTORE):
 # The About page, also usable as a standalone web page.
 about: assets/about.html
 
-assets/about.html: doc/about.md doc/style.html
+assets/about.html: doc/about.md doc/style.html doc/mathcal.lua doc/calligraphic-u.svg
 	mkdir -p assets
-	pandoc $< --standalone --include-in-header=doc/style.html -o $@
+	pandoc $< --standalone --lua-filter=doc/mathcal.lua --include-in-header=doc/style.html -o $@
 
 test: compile-tests
 	java -cp $(BUILD)/test:$(JUNIT) info.ro_che.auhasard.RunTests
