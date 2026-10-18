@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 
+@About("Drawing, picking and shuffling")
 public class RngTest {
     private static RandomSource seeded(long seed) {
         return StatCheck.seeded(seed);

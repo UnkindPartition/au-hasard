@@ -11,6 +11,7 @@ import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.junit.Test;
 
+@About("ChaCha20 random number generator")
 public class ChaCha20Test {
     private static int[] words(String hex) {
         String[] parts = hex.trim().split("\\s+");
