@@ -36,7 +36,7 @@ import java.util.List;
 public final class MainActivity extends Activity {
     private static final int MAX_SHUFFLE = 100;
 
-    private final RandomSource rnd = new SecureRandomSource();
+    private final ChaCha20Source rnd = ChaCha20Source.fromKernel();
 
     private SharedPreferences prefs;
     private File savedListsFile;
@@ -235,6 +235,7 @@ public final class MainActivity extends Activity {
     // Numbers.
 
     private void drawNumber() {
+        rnd.mix(System.nanoTime());
         long[] range = readRange();
         if (range == null) {
             return;
@@ -249,6 +250,7 @@ public final class MainActivity extends Activity {
     }
 
     private void shuffleNumbers() {
+        rnd.mix(System.nanoTime());
         long[] range = readRange();
         if (range == null) {
             return;
@@ -304,6 +306,7 @@ public final class MainActivity extends Activity {
     // Lists.
 
     private void drawItem() {
+        rnd.mix(System.nanoTime());
         List<String> items = readItems();
         if (items == null) {
             return;
@@ -317,6 +320,7 @@ public final class MainActivity extends Activity {
     }
 
     private void shuffleItems() {
+        rnd.mix(System.nanoTime());
         List<String> items = readItems();
         if (items == null) {
             return;

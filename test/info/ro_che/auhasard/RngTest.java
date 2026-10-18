@@ -135,13 +135,11 @@ public class RngTest {
 
     @Test
     @About(
-            "Draws 10000 numbers from 1..100 using the real secure generator and checks "
-            + "that every value occurs. The generator can't be seeded, so this is only a "
-            + "coarse check.")
-    public void uniformWithSecureRandom() {
-        // Not reproducible, so it only checks a coarse property: every value of a
-        // small range appears in a long run.
-        RandomSource rnd = new SecureRandomSource();
+            "Draws 10000 numbers from 1..100 using the app's generator, keyed from "
+            + "/dev/urandom, and checks that every value occurs. The key is unpredictable, so "
+            + "this is only a coarse check.")
+    public void uniformWithKernelKey() {
+        RandomSource rnd = ChaCha20Source.fromKernel();
         Set<Long> seen = new HashSet<>();
         for (int i = 0; i < 10000; i++) {
             seen.add(Rng.uniform(rnd, 1, 100));

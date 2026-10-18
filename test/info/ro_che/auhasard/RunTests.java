@@ -10,14 +10,16 @@ import org.junit.runner.notification.RunListener;
 
 /** Runs the tests, printing each test's description and diagnostics as it goes. */
 public final class RunTests {
-    private static final Class<?> TESTS = RngTest.class;
+    private static final Class<?>[] TESTS = {ChaCha20Test.class, RngTest.class};
 
     public static void main(String[] args) {
         boolean described = true;
-        for (Method m : TESTS.getMethods()) {
-            if (m.isAnnotationPresent(Test.class) && !m.isAnnotationPresent(About.class)) {
-                System.out.println("Test without @About: " + m.getName());
-                described = false;
+        for (Class<?> c : TESTS) {
+            for (Method m : c.getMethods()) {
+                if (m.isAnnotationPresent(Test.class) && !m.isAnnotationPresent(About.class)) {
+                    System.out.println("Test without @About: " + m.getName());
+                    described = false;
+                }
             }
         }
         if (!described) {
