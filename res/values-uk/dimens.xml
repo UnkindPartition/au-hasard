@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Cyrillic labels are wider and don't fit the tiles at the default size. -->
-    <dimen name="tile_label_size">9sp</dimen>
-</resources>

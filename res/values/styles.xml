@@ -90,6 +90,6 @@
         <item name="android:duplicateParentState">true</item>
         <item name="android:letterSpacing">0.08</item>
         <item name="android:textColor">@color/on_outline</item>
-        <item name="android:textSize">@dimen/tile_label_size</item>
+        <item name="android:textSize">13sp</item>
     </style>
 </resources>
