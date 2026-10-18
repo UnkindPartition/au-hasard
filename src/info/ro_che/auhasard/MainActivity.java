@@ -34,9 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MainActivity extends Activity {
-    private static final int MAX_SHUFFLE = 100;
-
-    private final ChaCha20Source rnd = ChaCha20Source.fromKernel();
+    private final Draws draws = Draws.fromKernel();
 
     private SharedPreferences prefs;
     private File savedListsFile;
@@ -235,35 +233,31 @@ public final class MainActivity extends Activity {
     // Numbers.
 
     private void drawNumber() {
-        rnd.mix(System.nanoTime());
+        long tap = System.nanoTime();
         long[] range = readRange();
         if (range == null) {
             return;
         }
-        long v = Rng.uniform(rnd, range[0], range[1]);
+        long v = draws.number(range[0], range[1], tap);
         numbersNote.setVisibility(View.GONE);
         numbersResult.showSingle(
                 String.valueOf(v),
                 getString(R.string.drawn_from),
                 "(" + range[0] + ", " + range[1] + ")",
-                () -> String.valueOf(Rng.uniform(rnd, range[0], range[1])));
+                () -> String.valueOf(draws.reelNumber(range[0], range[1])));
     }
 
     private void shuffleNumbers() {
-        rnd.mix(System.nanoTime());
+        long tap = System.nanoTime();
         long[] range = readRange();
         if (range == null) {
             return;
         }
+        long[] v = draws.shuffledNumbers(range[0], range[1], tap);
         BigInteger size =
                 BigInteger.valueOf(range[1])
                         .subtract(BigInteger.valueOf(range[0]))
                         .add(BigInteger.ONE);
-        int count =
-                size.compareTo(BigInteger.valueOf(MAX_SHUFFLE)) > 0
-                        ? MAX_SHUFFLE
-                        : size.intValue();
-        long[] v = Rng.distinctNumbers(rnd, range[0], range[1], count);
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < v.length; i++) {
             if (i > 0) {
@@ -271,8 +265,8 @@ public final class MainActivity extends Activity {
             }
             text.append(v[i]);
         }
-        if (BigInteger.valueOf(count).compareTo(size) < 0) {
-            numbersNote.setText(getString(R.string.shuffle_capped, count, size.toString()));
+        if (BigInteger.valueOf(v.length).compareTo(size) < 0) {
+            numbersNote.setText(getString(R.string.shuffle_capped, v.length, size.toString()));
             numbersNote.setVisibility(View.VISIBLE);
         } else {
             numbersNote.setVisibility(View.GONE);
@@ -306,26 +300,26 @@ public final class MainActivity extends Activity {
     // Lists.
 
     private void drawItem() {
-        rnd.mix(System.nanoTime());
+        long tap = System.nanoTime();
         List<String> items = readItems();
         if (items == null) {
             return;
         }
         listResult.showSingle(
-                Rng.pick(rnd, items, 1).get(0),
+                draws.item(items, tap),
                 getResources().getQuantityString(R.plurals.drawn_from_items, items.size(), items.size()),
                 null,
-                () -> Rng.pick(rnd, items, 1).get(0));
+                () -> draws.reelItem(items));
         copyButton.setEnabled(true);
     }
 
     private void shuffleItems() {
-        rnd.mix(System.nanoTime());
+        long tap = System.nanoTime();
         List<String> items = readItems();
         if (items == null) {
             return;
         }
-        List<String> shuffled = Rng.shuffle(rnd, items);
+        List<String> shuffled = draws.shuffledItems(items, tap);
         // Each item preceded by its position, small and in the accent color.
         SpannableStringBuilder text = new SpannableStringBuilder();
         for (int i = 0; i < shuffled.size(); i++) {

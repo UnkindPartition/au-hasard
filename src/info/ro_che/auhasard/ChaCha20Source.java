@@ -18,8 +18,14 @@ public final class ChaCha20Source implements RandomSource {
     private final int[] block = new int[16];
     /** The next unused word of the block; 16 when it's used up. */
     private int next;
+    private final MessageDigest sha;
 
     ChaCha20Source(byte[] key) {
+        try {
+            sha = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
         setKey(key);
     }
 
@@ -58,12 +64,6 @@ public final class ChaCha20Source implements RandomSource {
 
     /** Replaces the key with the SHA-256 hash of the key followed by {@code input}. */
     void mix(long input) {
-        MessageDigest sha;
-        try {
-            sha = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
         byte[] bytes = new byte[32 + 8];
         for (int i = 0; i < 8; i++) {
             putLittleEndian(bytes, 4 * i, key[i]);

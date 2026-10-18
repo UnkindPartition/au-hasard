@@ -18,7 +18,7 @@ import org.junit.runner.notification.RunListener;
  * printed.
  */
 public final class RunTests {
-    private static final Class<?>[] TESTS = {ChaCha20Test.class, RngTest.class};
+    private static final Class<?>[] TESTS = {ChaCha20Test.class, RngTest.class, DrawsTest.class};
 
     private static final PrintStream out = System.out;
     private static final boolean color = isTerminal();
