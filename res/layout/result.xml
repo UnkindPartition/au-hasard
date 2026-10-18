@@ -51,7 +51,7 @@
                 android:id="@+id/caption_args"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/lm_roman"
+                android:fontFamily="@font/cmu_serif"
                 android:saveEnabled="false"
                 android:textColor="@color/accent"
                 android:textSize="18sp" />

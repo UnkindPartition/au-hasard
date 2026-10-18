@@ -48,8 +48,8 @@ final class ResultArea {
         captionText = root.findViewById(R.id.caption_text);
         captionU = root.findViewById(R.id.caption_u);
         captionArgs = root.findViewById(R.id.caption_args);
-        italic = root.getResources().getFont(R.font.lm_roman_italic);
-        regular = root.getResources().getFont(R.font.lm_roman);
+        italic = root.getResources().getFont(R.font.cmu_serif_italic);
+        regular = root.getResources().getFont(R.font.cmu_serif);
     }
 
     boolean isEmpty() {

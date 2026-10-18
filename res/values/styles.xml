@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Text in the small caps font: lowercase letters come out as small capitals. -->
+    <!-- Small capitals in place of lowercase letters. -->
     <style name="SmallCaps">
-        <item name="android:fontFamily">@font/lm_roman_caps</item>
+        <item name="android:fontFamily">@font/cmu_serif</item>
+        <item name="android:fontFeatureSettings">smcp</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
@@ -20,7 +21,7 @@
     <style name="RangeLabel">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily">@font/lm_roman_italic</item>
+        <item name="android:fontFamily">@font/cmu_serif_italic</item>
         <item name="android:textColor">@color/soft</item>
         <item name="android:textSize">20sp</item>
     </style>
@@ -30,7 +31,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:background">@drawable/box</item>
-        <item name="android:fontFamily">@font/lm_roman</item>
+        <item name="android:fontFamily">@font/cmu_serif</item>
         <item name="android:gravity">end</item>
         <item name="android:importantForAutofill">no</item>
         <item name="android:inputType">numberSigned</item>

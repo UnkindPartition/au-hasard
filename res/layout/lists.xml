@@ -21,7 +21,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/box"
-            android:fontFamily="@font/lm_roman"
+            android:fontFamily="@font/cmu_serif"
             android:gravity="top|start"
             android:hint="@string/list_hint"
             android:imeOptions="flagNoPersonalizedLearning"
