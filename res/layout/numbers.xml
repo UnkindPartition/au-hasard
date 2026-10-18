@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/numbers_panel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Label"
+                android:labelFor="@+id/min"
+                android:text="@string/min" />
+
+            <EditText
+                android:id="@+id/min"
+                style="@style/NumberInput"
+                android:imeOptions="actionNext|flagNoPersonalizedLearning" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Label"
+                android:labelFor="@+id/max"
+                android:text="@string/max" />
+
+            <EditText
+                android:id="@+id/max"
+                style="@style/NumberInput"
+                android:imeOptions="actionDone|flagNoPersonalizedLearning" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/numbers_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:freezesText="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/numbers_result"
+            style="@style/Result" />
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/draw_number"
+            style="@style/ActionButton"
+            android:layout_marginEnd="8dp"
+            android:text="@string/draw" />
+
+        <Button
+            android:id="@+id/shuffle_numbers"
+            style="@style/ActionButton"
+            android:layout_marginStart="8dp"
+            android:text="@string/shuffle" />
+    </LinearLayout>
+</LinearLayout>

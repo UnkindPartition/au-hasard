@@ -23,11 +23,12 @@ $(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml
 		--java $(BUILD)/gen $(BUILD)/res.zip
 
 # Compiling against android.jar as the boot class path (which requires -source 8)
-# rejects JDK APIs that Android doesn't have.
+# rejects JDK APIs that Android doesn't have. The lambda stubs let javac compile lambdas,
+# which d8 then desugars.
 $(BUILD)/classes.dex: $(BUILD)/resources.apk $(shell find src -name '*.java')
 	rm -rf $(BUILD)/classes
 	mkdir -p $(BUILD)/classes
-	javac -source 8 -target 8 -Xlint:-options -bootclasspath $(PLATFORM) \
+	javac -source 8 -target 8 -Xlint:-options -bootclasspath $(PLATFORM):$(BUILD_TOOLS)/core-lambda-stubs.jar \
 		-d $(BUILD)/classes $$(find src $(BUILD)/gen -name '*.java')
 	$(BUILD_TOOLS)/d8 --release --min-api 29 --lib $(PLATFORM) --output $(BUILD) \
 		$$(find $(BUILD)/classes -name '*.class')

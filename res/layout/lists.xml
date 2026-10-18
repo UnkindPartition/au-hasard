@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lists_panel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/list_input"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="top|start"
+            android:hint="@string/list_hint"
+            android:imeOptions="flagNoPersonalizedLearning"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/paste"
+                style="@style/SideButton"
+                android:text="@string/paste" />
+
+            <Button
+                android:id="@+id/copy"
+                style="@style/SideButton"
+                android:text="@string/copy" />
+
+            <Button
+                android:id="@+id/save"
+                style="@style/SideButton"
+                android:text="@string/save" />
+
+            <Button
+                android:id="@+id/saved"
+                style="@style/SideButton"
+                android:text="@string/saved" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/list_result"
+            style="@style/Result" />
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/draw_item"
+            style="@style/ActionButton"
+            android:layout_marginEnd="8dp"
+            android:text="@string/draw" />
+
+        <Button
+            android:id="@+id/shuffle_items"
+            style="@style/ActionButton"
+            android:layout_marginStart="8dp"
+            android:text="@string/shuffle" />
+    </LinearLayout>
+</LinearLayout>

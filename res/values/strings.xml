@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Au hasard</string>
+
+    <string name="tab_numbers">Numbers</string>
+    <string name="tab_lists">Lists</string>
+
+    <string name="min">Min</string>
+    <string name="max">Max</string>
+    <string name="draw">Draw</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="shuffle_capped">Showing %1$d of %2$s numbers</string>
+    <string name="error_number">Enter a whole number</string>
+    <string name="error_max_below_min">Must not be less than Min</string>
+
+    <string name="list_hint">One item per line</string>
+    <string name="paste">Paste</string>
+    <string name="copy">Copy</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="error_empty_list">The list is empty</string>
+    <string name="copied">Copied</string>
+    <string name="clipboard_empty">The clipboard is empty</string>
+    <string name="list_saved">List saved</string>
+    <string name="already_saved">This list is already saved</string>
+    <string name="saved_lists">Saved lists</string>
+    <string name="no_saved_lists">No saved lists yet</string>
+    <string name="delete_list">Delete this list?</string>
+    <string name="delete">Delete</string>
+    <string name="error_storage">Could not access saved lists</string>
 </resources>
