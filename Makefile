@@ -32,14 +32,20 @@ $(BUILD)/resources.apk: $(BUILD)/res.zip AndroidManifest.xml assets/about.html $
 $(BUILD)/classes.dex: $(BUILD)/resources.apk $(shell find src -name '*.java')
 	rm -rf $(BUILD)/classes
 	mkdir -p $(BUILD)/classes
-	javac -source 8 -target 8 -Xlint:-options -bootclasspath $(PLATFORM):$(BUILD_TOOLS)/core-lambda-stubs.jar \
-		-d $(BUILD)/classes $$(find src $(BUILD)/gen -name '*.java')
+	javac -source 8 -target 8 -Xlint:-options -encoding UTF-8 -bootclasspath $(PLATFORM):$(BUILD_TOOLS)/core-lambda-stubs.jar \
+		-d $(BUILD)/classes $$(find src $(BUILD)/gen -name '*.java' | sort)
 	$(BUILD_TOOLS)/d8 --release --min-api 29 --lib $(PLATFORM) --output $(BUILD) \
-		$$(find $(BUILD)/classes -name '*.class')
+		$$(find $(BUILD)/classes -name '*.class' | sort)
 
+# The unsigned APK is reproducible: classes.dex goes in with a fixed timestamp, since zip would
+# otherwise record the time of the build.
 $(BUILD)/aligned.apk: $(BUILD)/resources.apk $(BUILD)/classes.dex
 	cp $(BUILD)/resources.apk $(BUILD)/unaligned.apk
-	cd $(BUILD) && zip -q unaligned.apk classes.dex
+	rm -rf $(BUILD)/dex
+	mkdir $(BUILD)/dex
+	cp $(BUILD)/classes.dex $(BUILD)/dex/
+	TZ=UTC touch -d '2000-01-01 00:00:00' $(BUILD)/dex/classes.dex
+	cd $(BUILD)/dex && TZ=UTC zip -q -X ../unaligned.apk classes.dex
 	$(BUILD_TOOLS)/zipalign -f -p 4 $(BUILD)/unaligned.apk $@
 
 $(BUILD)/au-hasard-debug.apk: $(BUILD)/aligned.apk $(DEBUG_KEYSTORE)
