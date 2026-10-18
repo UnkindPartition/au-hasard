@@ -1,0 +1,16 @@
+% A 108pt x 108pt page of random digits: 12 rows by 18 columns of 9pt x 6pt cells.
+% The seed makes the digits reproducible.
+\documentclass{article}
+\newcount\digitrowno
+\newcount\digitcolno
+\def\digitcell{\hbox to 6pt{\hss\number\pdfuniformdeviate 10\hss}}
+% The strut makes each row 9pt tall, with the digits centered vertically.
+\def\digitrow{\hbox{\vrule height 7.7pt depth 1.3pt width 0pt
+  \digitcolno=0 \loop\digitcell\advance\digitcolno 1 \ifnum\digitcolno<18 \repeat}}
+\begin{document}
+\hoffset=-1in
+\voffset=-1in
+\pdfsetrandomseed 1
+\shipout\vbox{\special{papersize=108pt,108pt}\offinterlineskip
+  \digitrowno=0 \loop\digitrow\advance\digitrowno 1 \ifnum\digitrowno<12 \repeat}
+\end{document}

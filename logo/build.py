@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compose the launcher icon from the typeset formula."""
+"""Compose the launcher icon from the typeset formula and digits."""
 
 import math
 import os
@@ -7,6 +7,9 @@ import xml.etree.ElementTree as ET
 
 BACKGROUND = "#FFFFFF"
 FOREGROUND = "#000000"
+DIGITS = "#d0d0d0"
+# Width of the white outline around the formula, in canvas units; half of it shows.
+HALO = 2.4
 # Adaptive icon canvas (dp). Launchers show at most the central VISIBLE dp and
 # may mask it down to a SAFE dp circle, so the formula must fit inside that circle.
 SIZE = 108
@@ -43,7 +46,25 @@ def squircle(cx, cy, r, n=5, steps=96):
     return "M" + "L".join(f"{fmt(px)},{fmt(py)}" for px, py in pts) + "Z"
 
 
-def write_preview(path, paths, transform):
+def svg_layers(digits_paths, digits_transform, paths, transform, halo_width, indent):
+    """SVG markup of the full icon: background, digits, halo, formula."""
+    lines = [
+        f'<rect width="{SIZE}" height="{SIZE}" fill="{BACKGROUND}"/>',
+        f'<g fill="{DIGITS}" transform="{digits_transform}">',
+        *(f"  <path d=\"{d}\"/>" for d in digits_paths),
+        "</g>",
+        f'<g fill="{BACKGROUND}" stroke="{BACKGROUND}" stroke-width="{fmt(halo_width)}"'
+        f' stroke-linejoin="round" transform="{transform}">',
+        *(f"  <path d=\"{d}\"/>" for d in paths),
+        "</g>",
+        f'<g fill="{FOREGROUND}" transform="{transform}">',
+        *(f"  <path d=\"{d}\"/>" for d in paths),
+        "</g>",
+    ]
+    return "".join(indent + l + "\n" for l in lines)
+
+
+def write_preview(path, digits_paths, digits_transform, paths, transform, halo_width):
     m = (SIZE - VISIBLE) // 2
     c = SIZE / 2
     r = VISIBLE / 2
@@ -56,11 +77,17 @@ def write_preview(path, paths, transform):
     }
     ids = {name: f"mask{i}" for i, name in enumerate(masks)}
 
-    def icon(px, mask, bg, fg):
+    def icon(px, mask, themed=None):
+        """The full icon, or with themed = (bg, fg) the monochrome themed icon."""
+        content = (
+            '<use href="#full"/>'
+            if themed is None
+            else f'<rect width="{SIZE}" height="{SIZE}" fill="{themed[0]}"/>'
+            f'<use href="#logo" fill="{themed[1]}"/>'
+        )
         return (
             f'<svg width="{px}" height="{px}" viewBox="{m} {m} {VISIBLE} {VISIBLE}">'
-            f'<g clip-path="url(#{ids[mask]})"><rect width="{SIZE}" height="{SIZE}" fill="{bg}"/>'
-            f'<use href="#logo" fill="{fg}"/></g></svg>'
+            f'<g clip-path="url(#{ids[mask]})">{content}</g></svg>'
         )
 
     def cell(content, label):
@@ -83,14 +110,16 @@ def write_preview(path, paths, transform):
         f'<g id="logo" transform="{transform}">',
         *(f'<path d="{d}"/>' for d in paths),
         "</g>",
+        '<g id="full">',
+        svg_layers(digits_paths, digits_transform, paths, transform, halo_width, ""),
+        "</g>",
         *(f'<clipPath id="{ids[n]}"><path d="{d}"/></clipPath>' for n, d in masks.items()),
         "</defs></svg>",
         "<h1>Logo preview</h1>",
         "<section><h2>Canvas</h2><div class=\"row light\">",
         cell(
             f'<svg width="324" height="324" viewBox="0 0 {SIZE} {SIZE}">'
-            f'<rect width="{SIZE}" height="{SIZE}" fill="{BACKGROUND}"/>'
-            f'<use href="#logo" fill="{FOREGROUND}"/>'
+            '<use href="#full"/>'
             f'<rect x="{m}" y="{m}" width="{VISIBLE}" height="{VISIBLE}" fill="none"'
             ' stroke="#e53935" stroke-width="0.4" stroke-dasharray="2 1"/>'
             f'<circle cx="{c}" cy="{c}" r="{SAFE / 2}" fill="none"'
@@ -102,10 +131,10 @@ def write_preview(path, paths, transform):
     ]
     for cls, label in [("light", "Light"), ("dark", "Dark"), ("wallpaper", "Wallpaper")]:
         html.append(f'<div class="row {cls}">')
-        html += [cell(icon(64, name, BACKGROUND, FOREGROUND), name) for name in masks]
+        html += [cell(icon(64, name), name) for name in masks]
         html.append(f"</div><p>{label} background</p>")
     html.append("</section><section><h2>Sizes</h2><div class=\"row wallpaper\">")
-    html += [cell(icon(px, "Circle", BACKGROUND, FOREGROUND), f"{px}px") for px in (32, 48, 64, 96, 144, 192)]
+    html += [cell(icon(px, "Circle"), f"{px}px") for px in (32, 48, 64, 96, 144, 192)]
     html.append("</div></section><section><h2>Themed icons (Android 13+)</h2>")
     themes = [
         ("light", [("#d8e2ff", "#001a41"), ("#c8f0c4", "#0a3910"), ("#ffd8e4", "#3e001d")]),
@@ -113,78 +142,117 @@ def write_preview(path, paths, transform):
     ]
     for cls, colors in themes:
         html.append(f'<div class="row {cls}">')
-        html += [cell(icon(64, "Circle", bg, fg), f"{bg} / {fg}") for bg, fg in colors]
+        html += [cell(icon(64, "Circle", (bg, fg)), f"{bg} / {fg}") for bg, fg in colors]
         html.append("</div><p></p>")
     html.append("</section><section><h2>Google Play</h2><div class=\"row light\">")
-    html += [
-        cell(icon(px, "Rounded square", BACKGROUND, FOREGROUND), f"{px}px")
-        for px in (256, 96, 48)
-    ]
+    html += [cell(icon(px, "Rounded square"), f"{px}px") for px in (256, 96, 48)]
     html.append("</div></section></body></html>")
 
     with open(path, "w") as f:
         f.write("\n".join(html) + "\n")
 
 
-def main():
-    root = ET.parse("build/formula.svg").getroot()
-    x, y, w, h = map(float, root.get("viewBox").split())
-    paths = [p.get("d") for p in root.iter(SVG_NS + "path")]
+def load(path):
+    root = ET.parse(path).getroot()
+    box = tuple(map(float, root.get("viewBox").split()))
+    return box, [p.get("d") for p in root.iter(SVG_NS + "path")]
 
+
+def vector(path, body):
+    with open(path, "w") as f:
+        f.write(
+            '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
+            f'    android:width="{SIZE}dp"\n'
+            f'    android:height="{SIZE}dp"\n'
+            f'    android:viewportWidth="{SIZE}"\n'
+            f'    android:viewportHeight="{SIZE}">\n'
+        )
+        f.write(body)
+        f.write("</vector>\n")
+
+
+def group(tx, ty, s, body):
+    return (
+        "    <group\n"
+        f'        android:translateX="{fmt(tx)}"\n'
+        f'        android:translateY="{fmt(ty)}"\n'
+        f'        android:scaleX="{fmt(s)}"\n'
+        f'        android:scaleY="{fmt(s)}">\n'
+        f"{body}"
+        "    </group>\n"
+    )
+
+
+def path_element(d, fill, stroke_width=None):
+    stroke = (
+        f'            android:strokeColor="{fill}"\n'
+        f'            android:strokeWidth="{fmt(stroke_width)}"\n'
+        '            android:strokeLineJoin="round"\n'
+        if stroke_width
+        else ""
+    )
+    return (
+        "        <path\n"
+        f'            android:fillColor="{fill}"\n'
+        f"{stroke}"
+        f'            android:pathData="{d}" />\n'
+    )
+
+
+def main():
+    (x, y, w, h), paths = load("build/formula.svg")
     s = SAFE / math.hypot(w, h)
     tx = (SIZE - w * s) / 2 - x * s
     ty = (SIZE - h * s) / 2 - y * s
+    transform = f"translate({fmt(tx)} {fmt(ty)}) scale({fmt(s)})"
+    # The halo's stroke is in the formula's coordinates, which get scaled by s.
+    halo_width = HALO / s
+
+    # The digits fill the whole canvas.
+    (dx, dy, dw, _), digits_paths = load("build/digits.svg")
+    ds = SIZE / dw
+    dtx, dty = -dx * ds, -dy * ds
+    digits_transform = f"translate({fmt(dtx)} {fmt(dty)}) scale({fmt(ds)})"
 
     m = (SIZE - VISIBLE) // 2
 
     os.makedirs("out", exist_ok=True)
 
-    write_preview("out/preview.html", paths, f"translate({fmt(tx)} {fmt(ty)}) scale({fmt(s)})")
+    write_preview(
+        "out/preview.html", digits_paths, digits_transform, paths, transform, halo_width
+    )
 
     with open("out/icon.svg", "w") as f:
         f.write(
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{VISIBLE * 4}" height="{VISIBLE * 4}" '
             f'viewBox="{m} {m} {VISIBLE} {VISIBLE}">\n'
-            f'  <rect width="{SIZE}" height="{SIZE}" fill="{BACKGROUND}"/>\n'
-            f'  <g fill="{FOREGROUND}" transform="translate({fmt(tx)} {fmt(ty)}) scale({fmt(s)})">\n'
         )
-        for d in paths:
-            f.write(f'    <path d="{d}"/>\n')
-        f.write("  </g>\n</svg>\n")
+        f.write(svg_layers(digits_paths, digits_transform, paths, transform, halo_width, "  "))
+        f.write("</svg>\n")
 
-    header = (
-        '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
-        f'    android:width="{SIZE}dp"\n'
-        f'    android:height="{SIZE}dp"\n'
-        f'    android:viewportWidth="{SIZE}"\n'
-        f'    android:viewportHeight="{SIZE}">\n'
+    vector(
+        "../res/drawable/ic_launcher_background.xml",
+        "    <path\n"
+        f'        android:fillColor="{BACKGROUND}"\n'
+        f'        android:pathData="M0,0h{SIZE}v{SIZE}h-{SIZE}z" />\n'
+        # One path per digit: aapt2 can't store strings longer than 32767 characters.
+        + group(dtx, dty, ds, "".join(path_element(d, DIGITS) for d in digits_paths)),
     )
-
-    with open("../res/drawable/ic_launcher_foreground.xml", "w") as f:
-        f.write(header)
-        f.write(
-            "    <group\n"
-            f'        android:translateX="{fmt(tx)}"\n'
-            f'        android:translateY="{fmt(ty)}"\n'
-            f'        android:scaleX="{fmt(s)}"\n'
-            f'        android:scaleY="{fmt(s)}">\n'
-        )
-        for d in paths:
-            f.write(
-                "        <path\n"
-                f'            android:fillColor="{FOREGROUND}"\n'
-                f'            android:pathData="{d}" />\n'
-            )
-        f.write("    </group>\n</vector>\n")
-
-    with open("../res/drawable/ic_launcher_background.xml", "w") as f:
-        f.write(header)
-        f.write(
-            "    <path\n"
-            f'        android:fillColor="{BACKGROUND}"\n'
-            f'        android:pathData="M0,0h{SIZE}v{SIZE}h-{SIZE}z" />\n'
-            "</vector>\n"
-        )
+    vector(
+        "../res/drawable/ic_launcher_foreground.xml",
+        group(
+            tx,
+            ty,
+            s,
+            path_element("".join(paths), BACKGROUND, halo_width)
+            + "".join(path_element(d, FOREGROUND) for d in paths),
+        ),
+    )
+    # For themed icons, which tint the layer's shape: the formula without the halo.
+    vector(
+        "../res/drawable/ic_launcher_monochrome.xml",
+        group(tx, ty, s, "".join(path_element(d, FOREGROUND) for d in paths)),
+    )
 
 
 if __name__ == "__main__":
