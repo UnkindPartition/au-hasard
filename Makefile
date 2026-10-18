@@ -10,7 +10,7 @@ BUNDLETOOL ?= /opt/bundletool/bundletool.jar
 RELEASE_ALIAS ?= au-hasard
 UPLOAD_ALIAS ?= upload
 ABOUT_PAGES = assets/about.html assets/about-fr.html assets/about-uk.html
-ABOUT_DEPS = doc/style.html doc/mathcal.lua doc/calligraphic-u.svg
+ABOUT_DEPS = doc/style.html doc/mathcal.lua doc/formula.svg
 PANDOC_ABOUT = pandoc $< --standalone --lua-filter=doc/mathcal.lua --include-in-header=doc/style.html -o $@
 JUNIT = /usr/share/java/junit.jar:/usr/share/java/hamcrest/hamcrest.jar
 

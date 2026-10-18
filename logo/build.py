@@ -279,7 +279,7 @@ def main():
     )
     glyphs("build/formula.svg", "../res/drawable/formula.xml")
     glyphs("build/u.svg", "../res/drawable/calligraphic_u.xml")
-    inline_svg("build/u.svg", "../doc/calligraphic-u.svg", "𝒰")
+    inline_svg("build/formula.svg", "../doc/formula.svg", "𝒰(a, b)")
 
     # For themed icons, which tint the layer's shape: the formula without the halo.
     vector(

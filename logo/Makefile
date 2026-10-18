@@ -17,7 +17,7 @@ $(BUILD)/digits.svg: $(BUILD)/digits.dvi
 
 $(OUT)/icon.svg $(OUT)/preview.html ../res/drawable/ic_launcher_background.xml \
 		../res/drawable/ic_launcher_foreground.xml ../res/drawable/ic_launcher_monochrome.xml \
-		../res/drawable/formula.xml ../res/drawable/calligraphic_u.xml ../doc/calligraphic-u.svg &: \
+		../res/drawable/formula.xml ../res/drawable/calligraphic_u.xml ../doc/formula.svg &: \
 		$(BUILD)/formula.svg $(BUILD)/u.svg $(BUILD)/digits.svg build.py
 	python3 build.py
 
