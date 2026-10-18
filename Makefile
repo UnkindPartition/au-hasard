@@ -1,10 +1,14 @@
 # Requires: JDK, Android SDK (platform and build-tools), zip, pandoc.
+# The aab target also requires bundletool (https://github.com/google/bundletool).
 
 BUILD = build
 ANDROID_HOME ?= /opt/android-sdk
 PLATFORM = $(ANDROID_HOME)/platforms/android-36/android.jar
 BUILD_TOOLS = $(ANDROID_HOME)/build-tools/36.0.0
 DEBUG_KEYSTORE = $(HOME)/.android/debug.keystore
+BUNDLETOOL ?= /opt/bundletool/bundletool.jar
+RELEASE_ALIAS ?= au-hasard
+UPLOAD_ALIAS ?= upload
 JUNIT = /usr/share/java/junit.jar:/usr/share/java/hamcrest/hamcrest.jar
 
 apk: $(BUILD)/au-hasard-debug.apk
@@ -33,12 +37,46 @@ $(BUILD)/classes.dex: $(BUILD)/resources.apk $(shell find src -name '*.java')
 	$(BUILD_TOOLS)/d8 --release --min-api 29 --lib $(PLATFORM) --output $(BUILD) \
 		$$(find $(BUILD)/classes -name '*.class')
 
-$(BUILD)/au-hasard-debug.apk: $(BUILD)/resources.apk $(BUILD)/classes.dex $(DEBUG_KEYSTORE)
+$(BUILD)/aligned.apk: $(BUILD)/resources.apk $(BUILD)/classes.dex
 	cp $(BUILD)/resources.apk $(BUILD)/unaligned.apk
 	cd $(BUILD) && zip -q unaligned.apk classes.dex
-	$(BUILD_TOOLS)/zipalign -f -p 4 $(BUILD)/unaligned.apk $(BUILD)/aligned.apk
+	$(BUILD_TOOLS)/zipalign -f -p 4 $(BUILD)/unaligned.apk $@
+
+$(BUILD)/au-hasard-debug.apk: $(BUILD)/aligned.apk $(DEBUG_KEYSTORE)
 	$(BUILD_TOOLS)/apksigner sign --ks $(DEBUG_KEYSTORE) --ks-pass pass:android \
-		--out $@ $(BUILD)/aligned.apk
+		--out $@ $<
+
+# Release builds need RELEASE_KEYSTORE / UPLOAD_KEYSTORE and prompt for the
+# keystore password. See SIGNING.md.
+release-apk: $(BUILD)/au-hasard.apk
+
+# Signed with the app signing key, for F-Droid and direct downloads.
+$(BUILD)/au-hasard.apk: $(BUILD)/aligned.apk
+	$(if $(RELEASE_KEYSTORE),,$(error RELEASE_KEYSTORE is not set))
+	$(BUILD_TOOLS)/apksigner sign --ks $(RELEASE_KEYSTORE) --ks-key-alias $(RELEASE_ALIAS) \
+		--out $@ $<
+
+aab: $(BUILD)/au-hasard.aab
+
+# The base module is the proto-format resource APK rearranged into the layout
+# bundletool expects.
+$(BUILD)/base.zip: $(BUILD)/res.zip AndroidManifest.xml assets/about.html $(shell find assets -type f) $(BUILD)/classes.dex
+	rm -rf $(BUILD)/base $@
+	$(BUILD_TOOLS)/aapt2 link --proto-format -o $(BUILD)/proto.apk -I $(PLATFORM) \
+		--manifest AndroidManifest.xml -A assets $(BUILD)/res.zip
+	unzip -q $(BUILD)/proto.apk -d $(BUILD)/base
+	mkdir $(BUILD)/base/manifest $(BUILD)/base/dex
+	mv $(BUILD)/base/AndroidManifest.xml $(BUILD)/base/manifest/
+	cp $(BUILD)/classes.dex $(BUILD)/base/dex/
+	cd $(BUILD)/base && zip -q -X -r ../base.zip .
+
+# Signed with the Play upload key.
+$(BUILD)/au-hasard.aab: $(BUILD)/base.zip
+	$(if $(UPLOAD_KEYSTORE),,$(error UPLOAD_KEYSTORE is not set))
+	rm -f $@
+	java -jar $(BUNDLETOOL) build-bundle --modules=$< --output=$@
+	jarsigner -keystore $(UPLOAD_KEYSTORE) -storetype PKCS12 -digestalg SHA-256 \
+		-sigalg SHA256withRSA $@ $(UPLOAD_ALIAS)
 
 # The standard Android debug key, shared with other Android tooling.
 $(DEBUG_KEYSTORE):
@@ -69,4 +107,4 @@ compile-tests:
 clean:
 	rm -rf $(BUILD)
 
-.PHONY: apk install about test stats compile-tests clean
+.PHONY: apk install release-apk aab about test stats compile-tests clean
