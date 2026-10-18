@@ -1,4 +1,4 @@
-# Requires: TeX Live (latex, amsfonts), dvisvgm, python3, rsvg-convert (librsvg).
+# Requires: TeX Live (latex), dvisvgm, python3, rsvg-convert (librsvg).
 
 BUILD = build
 OUT = out
