@@ -26,6 +26,7 @@
     <string name="copy">Copy</string>
     <string name="save">Save</string>
     <string name="saved">Saved</string>
+    <string name="clear">Clear</string>
     <string name="error_empty_list">The list is empty</string>
     <string name="copied">Copied</string>
     <string name="clipboard_empty">The clipboard is empty</string>

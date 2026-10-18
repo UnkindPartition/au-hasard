@@ -10,11 +10,7 @@ import android.content.SharedPreferences;
 import android.graphics.Insets;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,7 +46,6 @@ public final class MainActivity extends Activity {
     private TextView numbersNote;
     private ResultArea numbersResult;
     private EditText listInput;
-    private View copyButton;
     private ResultArea listResult;
 
     @Override
@@ -70,7 +65,6 @@ public final class MainActivity extends Activity {
         numbersNote = findViewById(R.id.numbers_note);
         numbersResult = new ResultArea(findViewById(R.id.numbers_result));
         listInput = findViewById(R.id.list_input);
-        copyButton = findViewById(R.id.copy);
         listResult = new ResultArea(findViewById(R.id.list_result));
 
         // Keep content clear of the system bars and the keyboard.
@@ -95,16 +89,16 @@ public final class MainActivity extends Activity {
         findViewById(R.id.draw_number).setOnClickListener(v -> drawNumber());
         findViewById(R.id.shuffle_numbers).setOnClickListener(v -> shuffleNumbers());
         findViewById(R.id.paste).setOnClickListener(v -> paste());
-        copyButton.setOnClickListener(v -> copy());
+        findViewById(R.id.copy).setOnClickListener(v -> copy());
         findViewById(R.id.save).setOnClickListener(v -> save());
         findViewById(R.id.saved).setOnClickListener(v -> showSaved());
+        findViewById(R.id.clear).setOnClickListener(v -> clear());
         findViewById(R.id.draw_item).setOnClickListener(v -> drawItem());
         findViewById(R.id.shuffle_items).setOnClickListener(v -> shuffleItems());
 
         minInput.setText(prefs.getString("min", "1"));
         maxInput.setText(prefs.getString("max", "100"));
         listInput.setText(prefs.getString("list", ""));
-        copyButton.setEnabled(false);
         showTab(prefs.getInt("tab", 0));
     }
 
@@ -124,7 +118,6 @@ public final class MainActivity extends Activity {
         numbersNote.setVisibility(state.getBoolean("noteVisible") ? View.VISIBLE : View.GONE);
         numbersResult.restore(state, "numbers");
         listResult.restore(state, "list");
-        copyButton.setEnabled(!listResult.isEmpty());
     }
 
     @Override
@@ -310,7 +303,6 @@ public final class MainActivity extends Activity {
                 getResources().getQuantityString(R.plurals.drawn_from_items, items.size(), items.size()),
                 null,
                 () -> draws.reelItem(items));
-        copyButton.setEnabled(true);
     }
 
     private void shuffleItems() {
@@ -319,26 +311,8 @@ public final class MainActivity extends Activity {
         if (items == null) {
             return;
         }
-        List<String> shuffled = draws.shuffledItems(items, tap);
-        // Each item preceded by its position, small and in the accent color.
-        SpannableStringBuilder text = new SpannableStringBuilder();
-        for (int i = 0; i < shuffled.size(); i++) {
-            if (i > 0) {
-                text.append('\n');
-            }
-            int start = text.length();
-            text.append(String.valueOf(i + 1));
-            text.setSpan(
-                    new ForegroundColorSpan(getColor(R.color.accent)),
-                    start,
-                    text.length(),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            text.setSpan(
-                    new RelativeSizeSpan(0.75f), start, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            text.append('\u2002').append(shuffled.get(i));
-        }
-        listResult.showSequence(text, 20);
-        copyButton.setEnabled(true);
+        listInput.setText(TextUtils.join("\n", draws.shuffledItems(items, tap)));
+        listResult.clear();
     }
 
     /** The items of the list, or null after flagging that it is empty. */
@@ -352,9 +326,12 @@ public final class MainActivity extends Activity {
     }
 
     private void copy() {
+        if (readItems() == null) {
+            return;
+        }
         getSystemService(ClipboardManager.class)
                 .setPrimaryClip(
-                        ClipData.newPlainText(getString(R.string.app_name), listResult.text().toString()));
+                        ClipData.newPlainText(getString(R.string.app_name), listInput.getText().toString()));
         // Android 13+ confirms copies itself.
         if (Build.VERSION.SDK_INT < 33) {
             Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
@@ -372,6 +349,12 @@ public final class MainActivity extends Activity {
         }
         listInput.setText(text);
         listInput.setError(null);
+    }
+
+    private void clear() {
+        listInput.setText("");
+        listInput.setError(null);
+        listResult.clear();
     }
 
     private void save() {

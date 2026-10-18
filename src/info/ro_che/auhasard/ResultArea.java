@@ -52,14 +52,6 @@ final class ResultArea {
         regular = root.getResources().getFont(R.font.cmu_serif);
     }
 
-    boolean isEmpty() {
-        return value.length() == 0;
-    }
-
-    CharSequence text() {
-        return value;
-    }
-
     /**
      * Shows a single value with a caption; with non-null {@code args}, the caption ends in
      * "𝒰" followed by them. Before landing on the value, a reel scrolls through a few others
@@ -78,6 +70,10 @@ final class ResultArea {
 
     void showSequence(CharSequence value, float sp) {
         setSequence(value, sp);
+    }
+
+    void clear() {
+        setSequence("", 20);
     }
 
     private void setSingle(CharSequence value, CharSequence captionPrefix, CharSequence args) {

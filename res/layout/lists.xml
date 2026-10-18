@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="3"
         android:orientation="horizontal">
 
         <info.ro_che.auhasard.RuledEditText
@@ -96,6 +96,20 @@
                     style="@style/TileLabel"
                     android:text="@string/saved" />
             </info.ro_che.auhasard.TileLayout>
+
+            <info.ro_che.auhasard.TileLayout
+                android:id="@+id/clear"
+                style="@style/Tile"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    style="@style/TileIcon"
+                    android:src="@drawable/ic_clear" />
+
+                <TextView
+                    style="@style/TileLabel"
+                    android:text="@string/clear" />
+            </info.ro_che.auhasard.TileLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -105,7 +119,10 @@
 
     <include
         android:id="@+id/list_result"
-        layout="@layout/result" />
+        layout="@layout/result"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
 
     <LinearLayout
         android:layout_width="match_parent"
