@@ -13,7 +13,10 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowInsets;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -33,6 +36,8 @@ public final class MainActivity extends Activity {
     private SharedPreferences prefs;
     private File savedListsFile;
     private int tab;
+    private GestureDetector swipes;
+    private boolean swiped;
 
     private TextView tabNumbers;
     private TextView tabLists;
@@ -79,8 +84,9 @@ public final class MainActivity extends Activity {
                             return insets;
                         });
 
-        tabNumbers.setOnClickListener(v -> showTab(0));
-        tabLists.setOnClickListener(v -> showTab(1));
+        tabNumbers.setOnClickListener(v -> switchTab(0));
+        tabLists.setOnClickListener(v -> switchTab(1));
+        swipes = new GestureDetector(this, new SwipeListener());
         findViewById(R.id.draw_number).setOnClickListener(v -> drawNumber());
         findViewById(R.id.shuffle_numbers).setOnClickListener(v -> shuffleNumbers());
         findViewById(R.id.paste).setOnClickListener(v -> paste());
@@ -127,10 +133,73 @@ public final class MainActivity extends Activity {
                 .apply();
     }
 
+    /** Fling left or right anywhere to switch tabs. */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        swiped = false;
+        swipes.onTouchEvent(event);
+        if (swiped) {
+            // Don't let the view under the finger treat the swipe as a tap.
+            event.setAction(MotionEvent.ACTION_CANCEL);
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    private final class SwipeListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent start, MotionEvent end, float vx, float vy) {
+            if (start == null) {
+                return false;
+            }
+            float dx = end.getX() - start.getX();
+            float dy = end.getY() - start.getY();
+            ViewConfiguration config = ViewConfiguration.get(MainActivity.this);
+            if (Math.abs(dx) < 3 * Math.abs(dy)
+                    || Math.abs(dx) < 4 * config.getScaledTouchSlop()
+                    || Math.abs(vx) < 3 * config.getScaledMinimumFlingVelocity()) {
+                return false;
+            }
+            int target = dx < 0 ? 1 : 0;
+            if (target != tab) {
+                swiped = true;
+                switchTab(target);
+            }
+            return swiped;
+        }
+    }
+
+    /** Shows a tab, sliding it in from the side it's on. */
+    private void switchTab(int t) {
+        if (t == tab) {
+            return;
+        }
+        View in = t == 0 ? numbersPanel : listsPanel;
+        View out = t == 0 ? listsPanel : numbersPanel;
+        float width = ((View) in.getParent()).getWidth();
+        float direction = t == 1 ? 1 : -1;
+        in.animate().cancel();
+        out.animate().cancel();
+        showTab(t);
+        out.setVisibility(View.VISIBLE);
+        in.setTranslationX(direction * width);
+        out.setTranslationX(0);
+        in.animate().translationX(0).setDuration(200);
+        out.animate()
+                .translationX(-direction * width)
+                .setDuration(200)
+                .withEndAction(
+                        () -> {
+                            out.setVisibility(View.GONE);
+                            out.setTranslationX(0);
+                        });
+    }
+
     private void showTab(int t) {
         tab = t;
         numbersPanel.setVisibility(t == 0 ? View.VISIBLE : View.GONE);
         listsPanel.setVisibility(t == 1 ? View.VISIBLE : View.GONE);
+        numbersPanel.setTranslationX(0);
+        listsPanel.setTranslationX(0);
         tabNumbers.setSelected(t == 0);
         tabLists.setSelected(t == 1);
     }
