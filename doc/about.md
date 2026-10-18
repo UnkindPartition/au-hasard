@@ -71,3 +71,5 @@ Fisher–Yates.
 *Au hasard* works fully offline. The app doesn't even have permission to use
 the Internet, so nothing you enter or draw can leave your phone. Likewise, it
 doesn't collect or transmit any analytics or other data.
+
+[Privacy policy](https://ro-che.info/au-hasard/PRIVACY).
