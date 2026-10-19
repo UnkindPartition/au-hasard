@@ -1,0 +1,5 @@
+Draw random numbers or pick random items from your lists.
+
+Works completely offline and doesn't collect any data.
+
+Randomness is ensured by your phone's random number generator mixed with the exact moment of your pressing the button.

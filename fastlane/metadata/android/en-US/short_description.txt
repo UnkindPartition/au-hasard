@@ -1,0 +1,1 @@
+Fair random numbers and list picks: draw or shuffle, fully offline.
